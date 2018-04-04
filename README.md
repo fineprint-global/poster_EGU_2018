@@ -1,2 +1,3 @@
-# poster_EGU_2018
-R Scripts to reproduce maps and poster for EGU 2018 
+# EGU 2018 Poster
+
+Unfortunately, we cannot make SNL Metals & Mining Data available in our repository. The data can be acquired from S&P Global Market Intelligence such that:
