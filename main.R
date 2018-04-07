@@ -18,64 +18,20 @@ sources_files <- sapply(X = sources_files, FUN = source, local = .GlobalEnv)
 # Download and process SPAm data 
 spam_data_files <- download_process_spam(output_dir = "./output", quite = TRUE)
 
-# Read FAOSTAT 2005 crop production 
-faostat_2005 <- readr::read_csv("./input/FAOSTAT_data_3-9-2018.csv")
+# Select material of larger production 
+selected_crops <- spam_data_files %>% 
+  dplyr::filter(crop_system == "Total", crop %in% c("Wheat", "Soybean", "Oil Palm", "Rice", "Sugar Cane", "Maize")) 
 
-# Filter top production crops from SPAM (~80%)
-spam_2005_top <- spam_data_files %>% 
-  dplyr::filter(crop_system == "Total") %>% 
-  dplyr::filter(acc.p <= 0.8) %>% 
-  dplyr::ungroup()
+r_selected_crops <- selected_crops %>%
+  .$file %>% 
+  raster::stack()
 
-# Top production crops from FAOSTAT (~70%) 
-faostat_2005_top <- faostat_2005 %>% 
-  dplyr::mutate(production = as.double(Value)) %>% 
-  dplyr::arrange(desc(production)) %>% 
-  dplyr::mutate(acc.p = cumsum(production) / sum(production)) %>% 
-  dplyr::filter(acc.p <= 0.7)
+names(r_selected_crops) <- selected_crops$crop
 
-# Plot SPAM top production crops 
-spam_2005_top %>% 
-  ggplot2::ggplot(ggplot2::aes(x = crop, y = production, fill = crop)) +
-  ggplot2::geom_bar(stat = "identity") +
-  ggplot2::scale_fill_brewer(palette = "Paired") + 
-  ggplot2::theme(axis.text.x = ggplot2::element_blank()) +
-  ggplot2::ylab(label = "Production (t)") +
-  ggplot2::ggtitle(label = paste0("Crops holding ",trunc(tail(spam_2005_top$acc.p, 1)*100),"% from total production"))
+# Filter production smaller than 5Kt 
+r_selected_crops[r_selected_crops < 10000] <- NA
 
-# Plot FAOSTAT top production crops 
-faostat_2005_top %>% 
-  ggplot2::ggplot(ggplot2::aes(x = Item, y = production, fill = Item)) +
-  ggplot2::geom_bar(stat = "identity") +
-  ggplot2::scale_fill_brewer(palette = "Paired") + 
-  ggplot2::theme(axis.text.x = ggplot2::element_blank()) +
-  ggplot2::ylab(label = "Production (t)") +
-  ggplot2::ggtitle(label = paste0("Crops holding ",trunc(tail(faostat_2005_top$acc.p, 1)*100),"% from total production"))
-
-# Compare top FAOSTAT and SPAM - Compare only equivalent labels
-faostat_2005_top %>% 
-  dplyr::mutate(Item=replace(Item, Item == "Potatoes", "Potato")) %>% 
-  dplyr::mutate(Item=replace(Item, Item == "Soybeans", "Soybean")) %>% 
-  dplyr::mutate(Item=replace(Item, Item == "Rice, paddy", "Rice")) %>% 
-  dplyr::transmute(Crop = stringr::str_to_title(Item), Source = "FAOSTAT", Production = production) %>% 
-  dplyr::bind_rows(., spam_2005_top %>% dplyr::transmute(Crop = crop, Source = "SPAM", Production = production)) %>%
-  dplyr::group_by(Crop) %>% 
-  dplyr::filter(n() > 1) %>% 
-  ggplot2::ggplot(ggplot2::aes(x = Crop, y = Production, fill = Crop, alpha = Source)) +
-  ggplot2::geom_bar(stat = "identity", position = "dodge") +
-  ggplot2::scale_fill_brewer(palette = "Paired") +
-  ggplot2::scale_alpha_manual(values = c(0.7, 1)) +
-  ggplot2::theme(axis.text.x = ggplot2::element_blank()) +
-  ggplot2::ylab(label = "Production (t)")
-
-# Select top SPAM production 
-spam_data_files_top <- spam_data_files %>% 
-  dplyr::filter(crop_system == "Total", acc.p <= .8) 
-
-r_spam_2005_top <- raster::stack(spam_data_files_top$file) 
-names(r_spam_2005_top) <- spam_data_files_top$crop
-
-# Download and process SNL data 
+# Read and process SNL data 
 filename <- "EGU_poster_mining_data.xls"
 path <- "./input"
 data_raw <- readxl::read_excel(file.path(path, filename), na = c("na", "Na", "NA")) 
@@ -90,50 +46,17 @@ data_raw_gold <- snl_tidy(data_raw_gold, meas.unit = "oz")
 data <- data_raw_gold %>% 
   dplyr::mutate(production = production * 2.835e-5) %>% 
   dplyr::mutate(production_unit = "tons") %>% 
-  dplyr::bind_rows(data_raw, .)
+  dplyr::bind_rows(data_raw, .) %>% 
+  dplyr::filter(year == 2005)
 
 # Creat sf (simple feature) object from SNL data 
 snl_production <- data %>% 
   dplyr::filter(!is.na(lat) | !is.na(long)) %>% 
-  sf::st_as_sf(coords = c("long", "lat"), crs = as.character(raster::crs(r_spam_2005_top)) ) 
-
-# Total production by country 
-snl_production_by_country <- snl_production %>% 
-  dplyr::select(country, commodity, production) %>% 
-  dplyr::group_by(country, commodity) %>% 
-  dplyr::summarise(total = sum(production, na.rm = TRUE)) 
-
-# Top producers
-snl_production_by_country %>% 
-  dplyr::group_by(commodity) %>% 
-  dplyr::arrange(dplyr::desc(total), .by_group = TRUE) %>% 
-  dplyr::mutate(p = cumsum(total)/sum(total, na.rm = TRUE)) %>% 
-  dplyr::slice(1)
-
-# Group SNL data by commodity and select year 2005 
-snl_production_2005 <- snl_production %>% 
-  dplyr::filter(year == "2005", !is.na(production)) %>% 
-  dplyr::arrange(commodity, desc(production)) %>% 
-  dplyr::group_by(commodity) %>% 
-  dplyr::mutate(Acc.p = cumsum(production) / sum(production, na.rm = TRUE)) %>% 
-  dplyr::ungroup()
+  sf::st_as_sf(coords = c("long", "lat"), crs = as.character(raster::crs(r_selected_crops)) ) 
 
 # Create SNL grid 
-snl_grid <- aggregate_snl_to_grid(sf_tbl = snl_production, r = r_spam_2005_top)
+snl_grid <- aggregate_snl_to_grid(sf_tbl = snl_production, r = r_selected_crops)
 sf::write_sf(snl_grid, "./output/snl_grid.gpkg", delete_layer = TRUE)
-
-# Select material of larger production 
-selected_crops <- spam_data_files %>% 
-  dplyr::filter(crop_system == "Total", crop %in% c("Wheat", "Soybean", "Oil Palm", "Rice", "Sugar Cane", "Maize")) 
-  
-r_selected_crops <- selected_crops %>%
-  .$file %>% 
-  raster::stack()
-
-names(r_selected_crops) <- selected_crops$crop
-
-# Filter production smaller than 5Kt 
-r_selected_crops[r_selected_crops < 10000] <- NA
 
 # Merge SPAM and SNL data 
 r_snl_production <- snl_to_raster(grid = snl_grid, r = r_selected_crops, attr = c("Copper", "Gold", "Iron.Ore", "Nickel"))
