@@ -107,8 +107,6 @@ df <- stars::read_stars("./output/snl_spam_largest_production.tif") %>%
 # Plot scale 
 zoom_scale <- 12
 
-make_bbox()
-
 # Set bbox for zoom areas 
 zoom_bbox <- tibble::tribble(
   ~region,                    ~x_lim,            ~y_lim,
@@ -157,7 +155,7 @@ gp_global_map <- gp_global_map + ggplot2::theme(legend.position = "none")
 
 # Add zoom bbox
 
-ggplot2::ggsave("plot_global_map.tif", plot = gp_global_map, device = "tiff", path = "./output",
+ggplot2::ggsave("plot_global_map.tif", plot = gp_global_map, device = "tiff", path = "./svg",
                 scale = 1, width = 1189, height = 600, units = "mm", dpi = 300)
 
 
@@ -176,7 +174,7 @@ gp_chile_map <- ggplot2::ggplot(chile_map, aes(x = long, y = lat, group = group)
   ggplot2::theme(legend.position = "bottom", plot.margin = grid::unit(c(0,0,0,0), "mm"))
 gp_chile_map
 gp_chile_map <- gp_chile_map + ggplot2::theme(legend.position = "none")
-ggplot2::ggsave("plot_zoom_chile.tif", plot = gp_chile_map, device = "tiff", path = "./output",
+ggplot2::ggsave("plot_zoom_chile.tif", plot = gp_chile_map, device = "tiff", path = "./svg",
                 scale = 1, width = diff(lim$x_lim[[1]]) * zoom_scale, height = diff(lim$y_lim[[1]]) * zoom_scale, units = "mm", dpi = 300)
 
   
@@ -197,7 +195,7 @@ gp_map_south_africa <- ggplot2::ggplot(map_south_africa, aes(x = long, y = lat, 
 gp_map_south_africa
 
 gp_map_south_africa <- gp_map_south_africa + ggplot2::theme(legend.position = "none")
-ggplot2::ggsave("plot_zoom_south_africa.tif", plot = gp_map_south_africa, device = "tiff", path = "./output",
+ggplot2::ggsave("plot_zoom_south_africa.tif", plot = gp_map_south_africa, device = "tiff", path = "./svg",
                 scale = 1, width = diff(lim$x_lim[[1]]) * zoom_scale, height = diff(lim$y_lim[[1]]) * zoom_scale, units = "mm", dpi = 300)
 
 # Zoom to MT Brazil 
@@ -219,7 +217,7 @@ gp_map_brazil <- ggplot2::ggplot(map_adm_br) +
 gp_map_brazil
 
 gp_map_brazil <- gp_map_brazil + ggplot2::theme(legend.position = "none")
-ggplot2::ggsave("plot_zoom_brazil.tif", plot = gp_map_brazil, device = "tiff", path = "./output",
+ggplot2::ggsave("plot_zoom_brazil.tif", plot = gp_map_brazil, device = "tiff", path = "./svg",
                 scale = 1, width = diff(lim$x_lim[[1]]) * zoom_scale, height = diff(lim$y_lim[[1]]) * zoom_scale, units = "mm", dpi = 300)
 
 
@@ -239,7 +237,7 @@ gp_map_indonesia <- ggplot2::ggplot(map_indonesia, aes(x = long, y = lat, group 
 gp_map_indonesia
 
 gp_map_indonesia <- gp_map_indonesia + ggplot2::theme(legend.position = "none")
-ggplot2::ggsave("plot_zoom_indonesia.tif", plot = gp_map_indonesia, device = "tiff", path = "./output",
+ggplot2::ggsave("plot_zoom_indonesia.tif", plot = gp_map_indonesia, device = "tiff", path = "./svg",
                 scale = 1, width = diff(lim$x_lim[[1]]) * zoom_scale, height = diff(lim$y_lim[[1]]) * zoom_scale, units = "mm", dpi = 300)
 
 

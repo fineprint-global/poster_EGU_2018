@@ -36,6 +36,8 @@ vignettes/*.pdf
 input/spam/*
 output/*
 *.png
+*.html
+*.tif
 
 # SNL files 
 input/*

@@ -433,10 +433,10 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="0.20462173"
-     inkscape:cx="3036.95"
-     inkscape:cy="1714.6768"
+     inkscape:cx="1773.4434"
+     inkscape:cy="1613.6429"
      inkscape:document-units="mm"
-     inkscape:current-layer="layer1"
+     inkscape:current-layer="g7433-4-9"
      showgrid="false"
      borderlayer="false"
      inkscape:showpageshadow="true"
@@ -473,11 +473,11 @@
      id="layer1"
      transform="translate(0,1927.5589)">
     <image
-       sodipodi:absref="C:\Users\vwegnerm\workspace\development\raw_material_extraction_egu_2018\output\plot_global_map.tif"
+       sodipodi:absref="plot_global_map.tif"
        y="-1500.4983"
        x="0.046111818"
        id="image4876"
-       xlink:href="file:///C:/Users/vwegnerm/workspace/development/raw_material_extraction_egu_2018/output/plot_global_map.tif"
+       xlink:href="plot_global_map.tif"
        preserveAspectRatio="none"
        height="2125.8"
        width="4212.8999" />
@@ -2192,11 +2192,11 @@
              id="rect7431-6"
              style="opacity:1;fill:#ffffff;fill-opacity:1;stroke:#ffffff;stroke-width:1.0001601;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;stroke-opacity:1" />
           <image
-             sodipodi:absref="C:\Users\vwegnerm\workspace\development\raw_material_extraction_egu_2018\output\plot_zoom_south_africa.tif"
+             sodipodi:absref="plot_zoom_south_africa.tif"
              y="1143.3551"
              x="1607.9468"
              id="image8229"
-             xlink:href="file:///C:/Users/vwegnerm/workspace/development/raw_material_extraction_egu_2018/output/plot_zoom_south_africa.tif"
+             xlink:href="plot_zoom_south_africa.tif"
              preserveAspectRatio="none"
              height="510"
              width="680.09998" />
@@ -2300,11 +2300,11 @@
              id="rect7431-6-1"
              style="opacity:1;fill:#ffffff;fill-opacity:1;stroke:#ffffff;stroke-width:1.0001601;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;stroke-opacity:1" />
           <image
-             sodipodi:absref="C:\Users\vwegnerm\workspace\development\raw_material_extraction_egu_2018\output\plot_zoom_brazil.tif"
+             sodipodi:absref="plot_zoom_brazil.tif"
              y="1148.5061"
              x="1607.7719"
              id="image36892"
-             xlink:href="file:///C:/Users/vwegnerm/workspace/development/raw_material_extraction_egu_2018/output/plot_zoom_brazil.tif"
+             xlink:href="plot_zoom_brazil.tif"
              preserveAspectRatio="none"
              height="454.5"
              width="484.79999" />
@@ -2411,11 +2411,11 @@
              id="rect7431-6-4"
              style="opacity:1;fill:#ffffff;fill-opacity:1;stroke:#ffffff;stroke-width:1.0001601;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;stroke-opacity:1" />
           <image
-             sodipodi:absref="C:\Users\vwegnerm\workspace\development\raw_material_extraction_egu_2018\output\plot_zoom_indonesia.tif"
+             sodipodi:absref="plot_zoom_indonesia.tif"
              y="1149.2778"
              x="1607.7717"
              id="image37069"
-             xlink:href="file:///C:/Users/vwegnerm/workspace/development/raw_material_extraction_egu_2018/output/plot_zoom_indonesia.tif"
+             xlink:href="plot_zoom_indonesia.tif"
              preserveAspectRatio="none"
              height="616.5"
              width="1126.5" />
@@ -3568,11 +3568,11 @@
            x="-9349.0029"
            sodipodi:role="line">Mining in Chile</tspan></text>
       <image
-         sodipodi:absref="C:\Users\vwegnerm\workspace\development\raw_material_extraction_egu_2018\output\plot_zoom_chile.tif"
+         sodipodi:absref="plot_zoom_chile.tif"
          y="-1034.7753"
          x="-9410.0771"
          id="image5267"
-         xlink:href="file:///C:/Users/vwegnerm/workspace/development/raw_material_extraction_egu_2018/output/plot_zoom_chile.tif"
+         xlink:href="plot_zoom_chile.tif"
          preserveAspectRatio="none"
          height="1065.5155"
          width="382.5" />
