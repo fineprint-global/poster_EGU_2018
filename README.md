@@ -34,9 +34,9 @@ From the S&P Global Market Intelligence platform, we used the following query cr
   + Latitude (degrees)
   + Longitude (degrees)
   + List of Commodities	
-  + Commodity Production - tonne[2005Y|(Best Of)|(Copper)]
-  + Commodity Production - tonne[2005Y|(Best Of)|(Iron Ore)]
-  + Commodity Production - tonne[2005Y|(Best Of)|(Nickel)]
+  + Commodity Production - tonne\[2005Y\|(Best Of)\|(Copper)\]
+  + Commodity Production - tonne\[2005Y\|(Best Of)\|(Iron Ore)\]
+  + Commodity Production - tonne\[2005Y\|(Best Of)\|(Nickel)\]
 - Export `as values` to `.xls` and leave the file unchanged and save as `EGU_poster_mining_data.xls` to `./input/`. We create a function `snl_tidy` which converts the data into `tidy` format. 
 
 - Filter only the commodities *gold* worldwide
