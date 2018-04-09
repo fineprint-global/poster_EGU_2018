@@ -21,7 +21,7 @@ The inputs for the R script are:
 - Subnational country divisions [GADM maps and data](http://biogeo.ucdavis.edu/data/gadm2.8/shp/BRA_adm_shp.zip)
 - Abiotic material from [SNL Metal and Mining Data](https://www.snl.com/web/client?auth=inherit#office/screener)
 
-Our script automatically downloads the data except for the SNL mining data, which is not open. Unfortunately, we cannot provide SNL Metals & Mining Data in our repository. The data can be purchased from S&P Global Market Intelligence at [https://www.snl.com/web/client?auth=inherit#office/screener](https://www.snl.com/web/client?auth=inherit#office/screener).
+Our script automatically downloads the data except for the SNL mining data, which is not open. Unfortunately, we cannot provide SNL Metals & Mining Data in our repository. The data can be purchased from S&P Global Market Intelligence at [https://www.spglobal.com/marketintelligence/en/campaigns/metals-mining](https://www.spglobal.com/marketintelligence/en/campaigns/metals-mining).
 
 From the S&P Global Market Intelligence platform, we used the following query criteria:
 - Filter only the commodities *copper*, *nickel* and *iron ore* worldwide
