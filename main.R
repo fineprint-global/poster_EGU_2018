@@ -18,18 +18,16 @@ sources_files <- sapply(X = sources_files, FUN = source, local = .GlobalEnv)
 # Download and process SPAm data 
 spam_data_files <- download_process_spam(output_dir = "./output", quite = TRUE)
 
-# Select material of larger production 
+# Select materials 
+crop_list <- c("Wheat", "Soybean", "Oil Palm", "Rice", "Sugar Cane", "Maize")
 selected_crops <- spam_data_files %>% 
-  dplyr::filter(crop_system == "Total", crop %in% c("Wheat", "Soybean", "Oil Palm", "Rice", "Sugar Cane", "Maize")) 
+  dplyr::filter(crop_system == "Total", crop %in% crop_list) 
 
 r_selected_crops <- selected_crops %>%
   .$file %>% 
   raster::stack()
 
 names(r_selected_crops) <- selected_crops$crop
-
-# Filter production smaller than 5Kt 
-r_selected_crops[r_selected_crops < 10000] <- NA
 
 # Read and process SNL data 
 filename <- "EGU_poster_mining_data.xls"
@@ -70,8 +68,8 @@ r_snl_spam_production <- raster::stack(r_snl_mask_crop, r_snl_production)
 raster::writeRaster(r_snl_spam_production, filename = "./output/snl_spam_production.tif", overwrite = TRUE)
 
 # Select material of lagest production for each pixel 
+r_snl_spam_production[r_snl_spam_production == 0] <- NA
 r_snl_spam_largest_production <- raster::which.max(r_snl_spam_production)
-r_snl_spam_largest_production[is.na(r_snl_spam_largest_production)] <- 0
 raster::writeRaster(r_snl_spam_largest_production, filename = "./output/snl_spam_largest_production.tif", overwrite = TRUE)
 
 # Create map legend colours 
@@ -102,7 +100,7 @@ df <- stars::read_stars("./output/snl_spam_largest_production.tif") %>%
   dplyr::mutate(Product = as.integer(snl_spam_largest_production.tif)) %>% 
   dplyr::transmute(x = x, y = y, group = 1, Product = factor(x = Product, 
                                                              levels = products_legend$class_id, 
-                                                             labels = products_legend$Product)) 
+                                                             labels = products_legend$Product, ordered = TRUE)) 
 
 # Plot scale 
 zoom_scale <- 12
