@@ -18,18 +18,16 @@ sources_files <- sapply(X = sources_files, FUN = source, local = .GlobalEnv)
 # Download and process SPAm data 
 spam_data_files <- download_process_spam(output_dir = "./output", quite = TRUE)
 
-# Select material of larger production 
+# Select materials 
+crop_list <- c("Wheat", "Soybean", "Oil Palm", "Rice", "Sugar Cane", "Maize")
 selected_crops <- spam_data_files %>% 
-  dplyr::filter(crop_system == "Total", crop %in% c("Wheat", "Soybean", "Oil Palm", "Rice", "Sugar Cane", "Maize")) 
+  dplyr::filter(crop_system == "Total", crop %in% crop_list) 
 
 r_selected_crops <- selected_crops %>%
   .$file %>% 
   raster::stack()
 
 names(r_selected_crops) <- selected_crops$crop
-
-# Filter production smaller than 5Kt 
-r_selected_crops[r_selected_crops < 10000] <- NA
 
 # Read and process SNL data 
 filename <- "EGU_poster_mining_data.xls"
@@ -59,7 +57,8 @@ snl_grid <- aggregate_snl_to_grid(sf_tbl = snl_production, r = r_selected_crops)
 sf::write_sf(snl_grid, "./output/snl_grid.gpkg", delete_layer = TRUE)
 
 # Merge SPAM and SNL data 
-r_snl_production <- snl_to_raster(grid = snl_grid, r = r_selected_crops, attr = c("Copper", "Gold", "Iron.Ore", "Nickel"))
+metal_list <- c("Copper", "Gold", "Iron.Ore", "Nickel")
+r_snl_production <- snl_to_raster(grid = snl_grid, r = r_selected_crops, attr = metal_list)
 
 # Remove crop from mining cells 
 r_snl_mask <- raster::stackApply(r_snl_production, indices = c(1), fun = sum, na.rm = TRUE, progress = 'text') > 0
@@ -70,8 +69,8 @@ r_snl_spam_production <- raster::stack(r_snl_mask_crop, r_snl_production)
 raster::writeRaster(r_snl_spam_production, filename = "./output/snl_spam_production.tif", overwrite = TRUE)
 
 # Select material of lagest production for each pixel 
+r_snl_spam_production[r_snl_spam_production == 0] <- NA
 r_snl_spam_largest_production <- raster::which.max(r_snl_spam_production)
-r_snl_spam_largest_production[is.na(r_snl_spam_largest_production)] <- 0
 raster::writeRaster(r_snl_spam_largest_production, filename = "./output/snl_spam_largest_production.tif", overwrite = TRUE)
 
 # Create map legend colours 
@@ -102,7 +101,7 @@ df <- stars::read_stars("./output/snl_spam_largest_production.tif") %>%
   dplyr::mutate(Product = as.integer(snl_spam_largest_production.tif)) %>% 
   dplyr::transmute(x = x, y = y, group = 1, Product = factor(x = Product, 
                                                              levels = products_legend$class_id, 
-                                                             labels = products_legend$Product)) 
+                                                             labels = products_legend$Product, ordered = TRUE)) 
 
 # Plot scale 
 zoom_scale <- 12
@@ -220,8 +219,6 @@ gp_map_brazil <- gp_map_brazil + ggplot2::theme(legend.position = "none")
 ggplot2::ggsave("plot_zoom_brazil.tif", plot = gp_map_brazil, device = "tiff", path = "./svg",
                 scale = 1, width = diff(lim$x_lim[[1]]) * zoom_scale, height = diff(lim$y_lim[[1]]) * zoom_scale, units = "mm", dpi = 300)
 
-
-
 # Zoom to Indonesia 
 map_indonesia <- ggplot2::map_data("world", region =  "Indonesia")
 lim <- zoom_bbox %>% 
@@ -241,4 +238,42 @@ ggplot2::ggsave("plot_zoom_indonesia.tif", plot = gp_map_indonesia, device = "ti
                 scale = 1, width = diff(lim$x_lim[[1]]) * zoom_scale, height = diff(lim$y_lim[[1]]) * zoom_scale, units = "mm", dpi = 300)
 
 
+# Global crop map 
+df_crop <- df %>% 
+  dplyr::filter(Product %in% c("Wheat", "Soybean", "Oil.Palm", "Rice", "Sugar.Cane", "Maize"))
+gp_global_map <- ggplot2::ggplot(map_world, aes(x = long, y = lat, group = group)) + 
+  ggplot2::geom_polygon(fill = "#e3e3e3") +
+  ggthemes::theme_map() +
+  ggplot2::coord_quickmap(xlim = c(-160, 175)) + # For more acurate portion of the earth use ggplot2::coord_map (slow)
+  ggplot2::geom_tile(data = df_crop, aes(x = x, y = y, fill = Product)) +
+  ggplot2::scale_fill_manual(values = legend_colour) + 
+  ggplot2::geom_path(data = map_world, mapping = aes(long, lat), colour = "#6f7072", size = 0.1) + 
+  ggplot2::theme(legend.position = "bottom", plot.margin = grid::unit(c(0,0,0,0), "mm"), 
+                 legend.text = element_text(size = 64),legend.key.size = unit(2, "cm"),
+                 legend.title = element_blank()) + 
+  ggplot2::guides(fill=guide_legend(nrow = 1))
 
+gp_global_map
+
+ggplot2::ggsave("plot_global_crop_map.tif", plot = gp_global_map, device = "tiff", path = "./svg",
+                scale = 1, width = 1189, height = 600, units = "mm", dpi = 300)
+
+
+# Global metal map 
+df_metal <- df %>% 
+  dplyr::filter(Product %in% c("Copper", "Gold", "Iron.Ore", "Nickel"))
+gp_global_map <- ggplot2::ggplot(map_world, aes(x = long, y = lat, group = group)) + 
+  ggplot2::geom_polygon(fill = "#e3e3e3") +
+  ggthemes::theme_map() +
+  ggplot2::coord_quickmap(xlim = c(-160, 175)) + # For more acurate portion of the earth use ggplot2::coord_map (slow)
+  ggplot2::geom_point(data = df_metal, aes(x = x, y = y, colour = Product), size = 8) +
+  ggplot2::scale_colour_manual(values = legend_colour) + 
+  ggplot2::geom_path(data = map_world, mapping = aes(long, lat), colour = "#6f7072", size = 0.1) + 
+  ggplot2::theme(legend.position = "bottom", plot.margin = grid::unit(c(0,0,0,0), "mm"), 
+                 legend.text = element_text(size = 64),legend.key.size = unit(12, "cm"),
+                 legend.title = element_blank())
+
+gp_global_map
+
+ggplot2::ggsave("plot_global_metal_map.tif", plot = gp_global_map, device = "tiff", path = "./svg",
+                scale = 1, width = 1189, height = 600, units = "mm", dpi = 300)
